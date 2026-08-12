@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta charset="utf-8">
+<style>
+  body{margin:0;font-family:Helvetica,Arial,sans-serif;background:#FAF8F6;-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box}
+  ::placeholder{color:#B2AAA1}
+  a{color:#B71822}
+  a:hover{color:#8C1015}
+  input,select,textarea,button{font-family:inherit}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:#E6E1DB;border-radius:4px}
+</style>
+</helmet>
+
+<sc-if value="{{ isLoggedIn }}" hint-placeholder-val="{{ false }}">
+  <div dir="{{ dir }}" style="min-height:100vh;display:flex;background:#FAF8F6;color:#171412">
+    <div style="width:250px;flex:none;background:#171412;color:#fff;display:flex;flex-direction:column;padding:22px 16px;gap:4px">
+      <div style="display:flex;align-items:center;gap:10px;padding:0 6px 20px">
+        <div style="width:38px;height:38px;border-radius:9px;background:#D81E27;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex:none">AH</div>
+        <div style="line-height:1.25">
+          <div style="font-weight:700;font-size:13.5px">{{ t.appName }}</div>
+          <div style="font-size:11px;color:#A79E96">Al Hamra Restaurant</div>
+        </div>
+      </div>
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="5">
+        <div onClick="{{ item.onClick }}" style="padding:11px 12px;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:10px" style-hover="background:rgba(255,255,255,0.06)">
+          <div style="width:7px;height:7px;border-radius:2px;background:{{ item.activeColor }}"></div>
+          {{ item.label }}
+        </div>
+      </sc-for>
+      <div style="flex:1"></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.12);padding-top:12px;margin-top:6px;display:flex;flex-direction:column;gap:8px">
+        <select value="{{ lang }}" onChange="{{ onLangChange }}" style="width:100%;background:#26221F;color:#fff;border:1px solid rgba(255,255,255,0.15);border-radius:7px;padding:8px 10px;font-size:12.5px">
+          <option value="en">English</option>
+          <option value="ar">العربية</option>
+          <option value="ur">اردو</option>
+          <option value="bn">বাংলা</option>
+        </select>
+        <sc-if value="{{ showAccountSwitcher }}" hint-placeholder-val="{{ false }}">
+          <select value="{{ currentAccountId }}" onChange="{{ onSwitchAccount }}" style="width:100%;background:#26221F;color:#fff;border:1px solid rgba(255,255,255,0.15);border-radius:7px;padding:8px 10px;font-size:12.5px">
+            <sc-for list="{{ accountOptions }}" as="acc" hint-placeholder-count="4">
+              <option value="{{ acc.id }}">{{ acc.label }}</option>
+            </sc-for>
+          </select>
+          <div style="font-size:10.5px;color:#8A8178;padding:0 2px">{{ switchAccountHint }}</div>
+        </sc-if>
+        <div onClick="{{ logout }}" style="padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#E5A6A9;text-align:center;border:1px solid rgba(255,255,255,0.15)">{{ t.logout }}</div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+      <div style="height:64px;flex:none;border-bottom:1px solid #E6E1DB;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#fff">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:17px;font-weight:700">{{ viewTitle }}</div>
+          <sc-if value="{{ showQuickAddButton }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onGoToNewTicket }}" style="display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;background:#D81E27;color:#fff;font-size:12.5px;font-weight:700;cursor:pointer">
+              <span style="font-size:15px;line-height:1">+</span>{{ t.newTicket }}
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;font-size:12.5px;color:#736C64">
+          <div style="position:relative">
+            <div onClick="{{ onToggleNotifications }}" style="width:36px;height:36px;border-radius:9px;background:#F7F5F3;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#171412" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#D81E27;border:1.5px solid #fff"></div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ showNotifications }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:44px;right:0;width:340px;background:#fff;border:1px solid #E6E1DB;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.14);z-index:20;overflow:hidden">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #F0EBE6">
+                  <div style="font-size:13px;font-weight:700;color:#171412">{{ t.notifications }}</div>
+                  <div onClick="{{ onMarkAllRead }}" style="font-size:11.5px;font-weight:600;color:#B71822;cursor:pointer">{{ t.markAllRead }}</div>
+                </div>
+                <div style="max-height:340px;overflow:auto">
+                  <sc-for list="{{ notifications }}" as="n" hint-placeholder-count="4">
+                    <div onClick="{{ n.onClick }}" style="display:flex;gap:10px;padding:12px 16px;cursor:pointer;border-bottom:1px solid #F7F5F3;background:{{ n.bg }}">
+                      <div style="width:8px;height:8px;border-radius:50%;background:{{ n.dotColor }};margin-top:5px;flex:none"></div>
+                      <div style="min-width:0">
+                        <div style="font-size:12.5px;font-weight:700;color:#171412">{{ n.title }}</div>
+                        <div style="font-size:12px;color:#736C64;margin-top:2px;line-height:1.4">{{ n.body }}</div>
+                        <div style="font-size:10.5px;color:#B2AAA1;margin-top:4px">{{ n.timeLabel }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ noNotifications }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:40px 20px;text-align:center;font-size:12.5px;color:#9A928A">{{ t.noNotifications }}</div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="width:30px;height:30px;border-radius:50%;background:#F0EBE6;color:#171412;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">{{ currentAccount.initials }}</div>
+          <div>
+            <div style="font-weight:700;color:#171412">{{ currentAccount.name }}</div>
+            <div>{{ currentAccount.roleLabel }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1;overflow:auto;padding:28px">
+
+        <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:22px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:13.5px;color:#736C64">{{ t.welcomeBack }}, {{ currentAccount.name }}</div>
+              <div style="display:flex;gap:10px;align-items:center">
+                <div style="display:flex;gap:6px;background:#F0EBE6;border-radius:9px;padding:3px">
+                  <sc-for list="{{ rangeOptions }}" as="r" hint-placeholder-count="4">
+                    <div onClick="{{ r.onClick }}" style="padding:7px 13px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ r.bg }};color:{{ r.fg }}">{{ r.label }}</div>
+                  </sc-for>
+                </div>
+                <div onClick="{{ onExportTicketsReport }}" style="padding:9px 15px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;background:#171412;color:#fff;white-space:nowrap">{{ t.exportByTickets }}</div>
+                <div onClick="{{ onExportUsersReport }}" style="padding:9px 15px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid #171412;color:#171412;white-space:nowrap">{{ t.exportByUsers }}</div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+              <sc-for list="{{ statCards }}" as="card" hint-placeholder-count="4">
+                <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:18px">
+                  <div style="font-size:12px;font-weight:600;color:#736C64;margin-bottom:10px">{{ card.label }}</div>
+                  <div style="font-size:30px;font-weight:700;color:{{ card.color }}">{{ card.value }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:16px">
+              <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:20px">
+                <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">{{ t.byStatus }}</div>
+                <sc-for list="{{ statusBars }}" as="b" hint-placeholder-count="6">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                    <div style="width:150px;font-size:12px;color:#4A453F;flex:none">{{ b.label }}</div>
+                    <div style="flex:1;background:#F0EBE6;border-radius:5px;height:10px;overflow:hidden"><div style="height:100%;border-radius:5px;background:{{ b.color }};width:{{ b.pct }}"></div></div>
+                    <div style="width:26px;text-align:right;font-size:12px;font-weight:700;flex:none">{{ b.count }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:20px">
+                <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">{{ t.byPriority }}</div>
+                <sc-for list="{{ priorityBars }}" as="b" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                    <div style="width:100px;font-size:12px;color:#4A453F;flex:none">{{ b.label }}</div>
+                    <div style="flex:1;background:#F0EBE6;border-radius:5px;height:10px;overflow:hidden"><div style="height:100%;border-radius:5px;background:{{ b.color }};width:{{ b.pct }}"></div></div>
+                    <div style="width:26px;text-align:right;font-size:12px;font-weight:700;flex:none">{{ b.count }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:20px">
+                <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">{{ t.byType }}</div>
+                <sc-for list="{{ typeBars }}" as="b" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                    <div style="width:150px;font-size:12px;color:#4A453F;flex:none">{{ b.label }}</div>
+                    <div style="flex:1;background:#F0EBE6;border-radius:5px;height:10px;overflow:hidden"><div style="height:100%;border-radius:5px;background:#D81E27;width:{{ b.pct }}"></div></div>
+                    <div style="width:26px;text-align:right;font-size:12px;font-weight:700;flex:none">{{ b.count }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:20px">
+                <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">{{ t.byBranch }}</div>
+                <sc-for list="{{ branchBars }}" as="b" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+                    <div style="width:150px;font-size:12px;color:#4A453F;flex:none">{{ b.label }}</div>
+                    <div style="flex:1;background:#F0EBE6;border-radius:5px;height:10px;overflow:hidden"><div style="height:100%;border-radius:5px;background:#171412;width:{{ b.pct }}"></div></div>
+                    <div style="width:26px;text-align:right;font-size:12px;font-weight:700;flex:none">{{ b.count }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:20px">
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">{{ t.userPerformance }}</div>
+              <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:10px;font-size:11px;font-weight:700;color:#9A928A;padding:0 4px 10px">
+                <div>{{ t.username }}</div><div>{{ t.assignedTickets }}</div><div>{{ t.avgResolution }}</div><div>{{ t.evaluation }}</div>
+              </div>
+              <sc-for list="{{ userPerformance }}" as="p" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:10px;font-size:13px;padding:11px 4px;border-top:1px solid #F0EBE6;align-items:center">
+                  <div style="font-weight:700">{{ p.name }}</div>
+                  <div>{{ p.assignedCount }}</div>
+                  <div>{{ p.avgResolutionLabel }}</div>
+                  <div style="padding:4px 10px;border-radius:6px;font-size:11.5px;font-weight:700;background:{{ p.evalBg }};color:{{ p.evalFg }};width:fit-content">{{ p.evalLabel }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background:#171412;border-radius:12px;padding:20px;color:#fff">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#D81E27"></div>
+                <div style="font-size:13.5px;font-weight:700">{{ t.aiInsights }}</div>
+              </div>
+              <sc-for list="{{ insights }}" as="ins" hint-placeholder-count="3">
+                <div style="font-size:13px;line-height:1.6;color:#D9D3CC;padding:8px 0;border-top:1px solid rgba(255,255,255,0.1)">{{ ins }}</div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isTicketList }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:14px">
+              <input value="{{ filters.search }}" onChange="{{ onSearchChange }}" placeholder="{{ t.search }}" style="flex:1;min-width:180px;border:1px solid #E6E1DB;border-radius:8px;padding:9px 12px;font-size:13px"/>
+              <select value="{{ filters.status }}" onChange="{{ onStatusFilterChange }}" style="border:1px solid #E6E1DB;border-radius:8px;padding:9px 10px;font-size:13px">
+                <option value="all">{{ t.filterStatus }}: {{ t.allOption }}</option>
+                <sc-for list="{{ statusOptions }}" as="s" hint-placeholder-count="6"><option value="{{ s.id }}">{{ s.label }}</option></sc-for>
+              </select>
+              <select value="{{ filters.priority }}" onChange="{{ onPriorityFilterChange }}" style="border:1px solid #E6E1DB;border-radius:8px;padding:9px 10px;font-size:13px">
+                <option value="all">{{ t.filterPriority }}: {{ t.allOption }}</option>
+                <sc-for list="{{ priorityOptions }}" as="p" hint-placeholder-count="4"><option value="{{ p.id }}">{{ p.label }}</option></sc-for>
+              </select>
+              <select value="{{ filters.category }}" onChange="{{ onCategoryFilterChange }}" style="border:1px solid #E6E1DB;border-radius:8px;padding:9px 10px;font-size:13px">
+                <option value="all">{{ t.filterCategory }}: {{ t.allOption }}</option>
+                <sc-for list="{{ categoryOptions }}" as="c" hint-placeholder-count="18"><option value="{{ c.id }}">{{ c.label }}</option></sc-for>
+              </select>
+              <sc-if value="{{ showBranchFilter }}" hint-placeholder-val="{{ false }}">
+                <select value="{{ filters.branch }}" onChange="{{ onBranchFilterChange }}" style="border:1px solid #E6E1DB;border-radius:8px;padding:9px 10px;font-size:13px">
+                  <option value="all">{{ t.filterBranch }}: {{ t.allOption }}</option>
+                  <sc-for list="{{ branchOptions }}" as="b" hint-placeholder-count="5"><option value="{{ b.id }}">{{ b.label }}</option></sc-for>
+                </select>
+              </sc-if>
+            </div>
+
+            <sc-if value="{{ hasFilteredTickets }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ filteredTickets }}" as="tk" hint-placeholder-count="4">
+                  <div onClick="{{ tk.onClick }}" style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:16px" style-hover="border-color:#D81E27">
+                    <div style="flex:1;min-width:0">
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                        <div style="font-size:10.5px;font-weight:700;color:#B2AAA1;white-space:nowrap;flex:none">#{{ tk.id }}</div>
+                        <div style="font-size:14px;font-weight:700;color:#171412">{{ tk.subject }}</div>
+                      </div>
+                      <div style="font-size:12px;color:#736C64">{{ tk.categoryLabel }} · {{ tk.branchName }} · {{ tk.dateLabel }}</div>
+                    </div>
+                    <div style="padding:5px 11px;border-radius:7px;font-size:11.5px;font-weight:700;background:{{ tk.priorityBg }};color:{{ tk.priorityFg }};flex:none">{{ tk.priorityLabel }}</div>
+                    <div style="padding:5px 11px;border-radius:7px;font-size:11.5px;font-weight:700;background:{{ tk.statusBg }};color:{{ tk.statusFg }};flex:none">{{ tk.statusLabel }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noFilteredTickets }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#fff;border:1px dashed #E6E1DB;border-radius:12px;padding:60px 20px;text-align:center">
+                <div style="font-size:14px;font-weight:700;color:#171412;margin-bottom:6px">{{ t.noTicketsFound }}</div>
+                <div style="font-size:12.5px;color:#9A928A">{{ t.tryAdjusting }}</div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isNewTicket }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:640px;background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:26px;display:flex;flex-direction:column;gap:16px">
+            <div>
+              <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:6px">{{ t.yourBranch }}</div>
+              <div style="font-size:14px;font-weight:700;padding:10px 12px;background:#F0EBE6;border-radius:8px">{{ newTicketBranchLabel }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div>
+                <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:6px">{{ t.ticketType }}</div>
+                <select value="{{ ticketForm.type }}" onChange="{{ onFormTypeChange }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:10px 12px;font-size:13.5px">
+                  <sc-for list="{{ typeOptions }}" as="ty" hint-placeholder-count="2"><option value="{{ ty.id }}">{{ ty.label }}</option></sc-for>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:6px">{{ t.filterPriority }}</div>
+                <select value="{{ ticketForm.priority }}" onChange="{{ onFormPriorityChange }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:10px 12px;font-size:13.5px">
+                  <sc-for list="{{ priorityOptions }}" as="p" hint-placeholder-count="4"><option value="{{ p.id }}">{{ p.label }}</option></sc-for>
+                </select>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:6px">{{ t.filterCategory }}</div>
+              <select value="{{ ticketForm.category }}" onChange="{{ onFormCategoryChange }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:10px 12px;font-size:13.5px">
+                <sc-for list="{{ categoryOptions }}" as="c" hint-placeholder-count="18"><option value="{{ c.id }}">{{ c.label }}</option></sc-for>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:6px">{{ t.subject }}</div>
+              <input value="{{ ticketForm.subject }}" onChange="{{ onFormSubjectChange }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:10px 12px;font-size:13.5px"/>
+            </div>
+            <div>
+              <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:6px">{{ t.description }}</div>
+              <textarea value="{{ ticketForm.description }}" onChange="{{ onFormDescriptionChange }}" rows="4" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:10px 12px;font-size:13.5px;resize:vertical"></textarea>
+            </div>
+            <div>
+              <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:8px">{{ t.attachments }}</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <sc-for list="{{ ticketForm.attachments }}" as="att" hint-placeholder-count="0">
+                  <div style="width:64px;height:64px;border-radius:8px;background:repeating-linear-gradient(45deg,#F0EBE6,#F0EBE6 6px,#E6E1DB 6px,#E6E1DB 12px);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:monospace;color:#736C64;text-align:center;padding:4px">{{ att.name }}</div>
+                </sc-for>
+                <label style="width:64px;height:64px;border-radius:8px;border:1.5px dashed #C7BFB6;display:flex;align-items:center;justify-content:center;font-size:22px;color:#9A928A;cursor:pointer">+
+                  <input type="file" accept="image/*" onChange="{{ onFileUpload }}" style="display:none"/>
+                </label>
+                <label style="width:64px;height:64px;border-radius:8px;border:1.5px dashed #C7BFB6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;color:#9A928A;cursor:pointer;font-weight:600">
+                  <div style="font-size:16px">◎</div>{{ t.takePhoto }}
+                  <input type="file" accept="image/*" capture="environment" onChange="{{ onFileUpload }}" style="display:none"/>
+                </label>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;padding-top:8px">
+              <div onClick="{{ onCancelNewTicket }}" style="padding:11px 18px;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;border:1px solid #E6E1DB;color:#4A453F">{{ t.cancel }}</div>
+              <div onClick="{{ onSubmitTicket }}" style="padding:11px 20px;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;background:#D81E27;color:#fff">{{ t.submitTicket }}</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isTicketDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:760px;display:flex;flex-direction:column;gap:16px">
+            <div onClick="{{ onBackToList }}" style="font-size:12.5px;font-weight:700;color:#736C64;cursor:pointer;width:fit-content">← {{ t.back }}</div>
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:22px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px">
+                <div>
+                  <div style="font-size:10.5px;font-weight:700;color:#B2AAA1;margin-bottom:4px">#{{ selectedTicket.id }}</div>
+                  <div style="font-size:19px;font-weight:700">{{ selectedTicket.subject }}</div>
+                </div>
+                <div style="display:flex;gap:8px;flex:none">
+                  <div style="padding:6px 12px;border-radius:7px;font-size:11.5px;font-weight:700;background:{{ selectedTicket.priorityBg }};color:{{ selectedTicket.priorityFg }}">{{ selectedTicket.priorityLabel }}</div>
+                  <div style="padding:6px 12px;border-radius:7px;font-size:11.5px;font-weight:700;background:{{ selectedTicket.statusBg }};color:{{ selectedTicket.statusFg }}">{{ selectedTicket.statusLabel }}</div>
+                </div>
+              </div>
+              <div style="font-size:13.5px;color:#4A453F;line-height:1.6;margin-bottom:16px">{{ selectedTicket.description }}</div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-top:14px;border-top:1px solid #F0EBE6;font-size:12px">
+                <div><div style="color:#9A928A;margin-bottom:3px">{{ t.filterCategory }}</div><div style="font-weight:700">{{ selectedTicket.categoryLabel }}</div></div>
+                <div><div style="color:#9A928A;margin-bottom:3px">{{ t.filterBranch }}</div><div style="font-weight:700">{{ selectedTicket.branchName }}</div></div>
+                <div><div style="color:#9A928A;margin-bottom:3px">{{ t.createdBy }}</div><div style="font-weight:700">{{ selectedTicket.createdByName }}</div></div>
+                <div><div style="color:#9A928A;margin-bottom:3px">{{ t.createdOn }}</div><div style="font-weight:700">{{ selectedTicket.dateLabel }}</div></div>
+              </div>
+              <sc-if value="{{ selectedTicket.hasAttachments }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid #F0EBE6">
+                  <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:8px">{{ t.attachments }}</div>
+                  <div style="display:flex;gap:10px">
+                    <sc-for list="{{ selectedTicket.attachments }}" as="att" hint-placeholder-count="0">
+                      <div style="width:64px;height:64px;border-radius:8px;background:repeating-linear-gradient(45deg,#F0EBE6,#F0EBE6 6px,#E6E1DB 6px,#E6E1DB 12px);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:monospace;color:#736C64;text-align:center;padding:4px">{{ att.name }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+              <div style="display:flex;gap:24px;margin-top:16px;padding-top:14px;border-top:1px solid #F0EBE6">
+                <sc-if value="{{ canChangeStatus }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:8px">{{ t.changeStatus }}</div>
+                    <select value="{{ selectedTicket.statusId }}" onChange="{{ onChangeStatus }}" style="border:1px solid #E6E1DB;border-radius:8px;padding:9px 12px;font-size:13px">
+                      <sc-for list="{{ statusOptions }}" as="s" hint-placeholder-count="6"><option value="{{ s.id }}">{{ s.label }}</option></sc-for>
+                    </select>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ canAssign }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:8px">{{ t.assignedTo }}</div>
+                    <select value="{{ selectedTicket.assigneeId }}" onChange="{{ onAssignTicket }}" style="border:1px solid #E6E1DB;border-radius:8px;padding:9px 12px;font-size:13px">
+                      <option value="">{{ t.unassigned }}</option>
+                      <sc-for list="{{ assignableUsers }}" as="u" hint-placeholder-count="4"><option value="{{ u.id }}">{{ u.name }}</option></sc-for>
+                    </select>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ showAssigneeReadOnly }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:8px">{{ t.assignedTo }}</div>
+                    <div style="font-size:13px;font-weight:700;padding:9px 0">{{ selectedTicket.assigneeName }}</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:22px">
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">{{ t.activityLog }}</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ selectedTicket.log }}" as="l" hint-placeholder-count="3">
+                  <div style="display:flex;gap:10px;align-items:flex-start">
+                    <div style="width:6px;height:6px;border-radius:50%;background:#C7BFB6;margin-top:6px;flex:none"></div>
+                    <div style="font-size:12.5px;color:#4A453F;line-height:1.5"><span style="font-weight:700;color:#171412">{{ l.author }}</span> {{ l.text }} <span style="color:#B2AAA1">· {{ l.dateLabel }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:22px">
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:14px">{{ t.comments }}</div>
+              <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+                <sc-for list="{{ selectedTicket.comments }}" as="c" hint-placeholder-count="2">
+                  <div style="background:#F7F5F3;border-radius:9px;padding:11px 13px">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                      <div style="font-size:12.5px;font-weight:700">{{ c.author }}</div>
+                      <div style="font-size:11px;color:#9A928A">{{ c.dateLabel }}</div>
+                    </div>
+                    <div style="font-size:13px;color:#4A453F;line-height:1.5">{{ c.text }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ canComment }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:10px">
+                  <input value="{{ newComment }}" onChange="{{ onNewCommentChange }}" placeholder="{{ t.addComment }}" style="flex:1;border:1px solid #E6E1DB;border-radius:8px;padding:10px 12px;font-size:13px"/>
+                  <div onClick="{{ onPostComment }}" style="padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:#171412;color:#fff">{{ t.post }}</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isBranches }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:820px;display:flex;flex-direction:column;gap:16px">
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:2fr 1.3fr 1.3fr 60px;padding:12px 18px;font-size:11px;font-weight:700;color:#9A928A;border-bottom:1px solid #F0EBE6">
+                <div>{{ t.branches }}</div><div>{{ t.username }}</div><div>{{ t.password }}</div><div></div>
+              </div>
+              <sc-for list="{{ branches }}" as="b" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:2fr 1.3fr 1.3fr 60px;padding:13px 18px;font-size:13px;align-items:center;border-bottom:1px solid #F7F5F3">
+                  <div style="font-weight:700">{{ b.name }}</div><div style="color:#736C64;font-family:monospace">{{ b.username }}</div><div style="color:#736C64;font-family:monospace">••••</div>
+                  <div onClick="{{ b.onDelete }}" style="color:#B71822;font-weight:700;font-size:12px;cursor:pointer">{{ t.delete }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+                <div style="flex:1;min-width:140px"><div style="font-size:11px;font-weight:700;color:#736C64;margin-bottom:5px">{{ t.branchNameEn }} *</div><input value="{{ newBranchName }}" onChange="{{ onNewBranchName }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:9px 11px;font-size:13px"/></div>
+                <div style="flex:1;min-width:140px" dir="rtl"><div style="font-size:11px;font-weight:700;color:#736C64;margin-bottom:5px">{{ t.branchNameAr }} *</div><input value="{{ newBranchNameAr }}" onChange="{{ onNewBranchNameAr }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:9px 11px;font-size:13px" dir="rtl"/></div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+                <div style="flex:1;min-width:120px"><div style="font-size:11px;font-weight:700;color:#736C64;margin-bottom:5px">{{ t.username }} *</div><input value="{{ newBranchUser }}" onChange="{{ onNewBranchUser }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:9px 11px;font-size:13px"/></div>
+                <div style="flex:1;min-width:120px"><div style="font-size:11px;font-weight:700;color:#736C64;margin-bottom:5px">{{ t.password }}</div><input value="{{ newBranchPass }}" onChange="{{ onNewBranchPass }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:9px 11px;font-size:13px"/></div>
+                <div onClick="{{ onAddBranch }}" style="padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:#D81E27;color:#fff;white-space:nowrap">{{ t.addBranch }}</div>
+              </div>
+              <sc-if value="{{ branchFormError }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;color:#B71822;font-weight:600">{{ t.requiredEnAr }}</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isUsers }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:820px;display:flex;flex-direction:column;gap:16px">
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:1.6fr 1.3fr 1.3fr 1.3fr 60px;padding:12px 18px;font-size:11px;font-weight:700;color:#9A928A;border-bottom:1px solid #F0EBE6">
+                <div>{{ t.username }}</div><div>{{ t.username }}</div><div>{{ t.role }}</div><div>{{ t.password }}</div><div></div>
+              </div>
+              <sc-for list="{{ users }}" as="u" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:1.6fr 1.3fr 1.3fr 1.3fr 60px;padding:13px 18px;font-size:13px;align-items:center;border-bottom:1px solid #F7F5F3">
+                  <div style="font-weight:700">{{ u.name }}</div><div style="color:#736C64;font-family:monospace">{{ u.username }}</div><div style="color:#4A453F">{{ u.role }}</div><div style="color:#736C64;font-family:monospace">••••</div>
+                  <div onClick="{{ u.onDelete }}" style="color:#B71822;font-weight:700;font-size:12px;cursor:pointer">{{ t.delete }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+              <div style="flex:1;min-width:130px"><div style="font-size:11px;font-weight:700;color:#736C64;margin-bottom:5px">{{ t.username }}</div><input value="{{ newUserName }}" onChange="{{ onNewUserName }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:9px 11px;font-size:13px"/></div>
+              <div style="flex:1;min-width:110px"><div style="font-size:11px;font-weight:700;color:#736C64;margin-bottom:5px">{{ t.username }}</div><input value="{{ newUserUsername }}" onChange="{{ onNewUserUsername }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:9px 11px;font-size:13px"/></div>
+              <div style="flex:1;min-width:110px"><div style="font-size:11px;font-weight:700;color:#736C64;margin-bottom:5px">{{ t.password }}</div><input value="{{ newUserPass }}" onChange="{{ onNewUserPass }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:9px 11px;font-size:13px"/></div>
+              <div style="flex:1;min-width:150px"><div style="font-size:11px;font-weight:700;color:#736C64;margin-bottom:5px">{{ t.role }}</div>
+                <select value="{{ newUserRole }}" onChange="{{ onNewUserRole }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:9px 11px;font-size:13px">
+                  <option>Super Admin</option><option>Maintenance Manager</option><option>Supervisor</option><option>Read Only</option>
+                </select>
+              </div>
+              <div onClick="{{ onAddUser }}" style="padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:#D81E27;color:#fff;white-space:nowrap">{{ t.addUser }}</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isFields }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:820px;display:flex;flex-direction:column;gap:20px">
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:20px">
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:12px">{{ t.filterCategory }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+                <sc-for list="{{ categories }}" as="c" hint-placeholder-count="18">
+                  <div style="display:flex;align-items:center;gap:7px;background:#F7F5F3;border-radius:7px;padding:7px 11px;font-size:12.5px">{{ c.label }}<span onClick="{{ c.onDelete }}" style="color:#B71822;cursor:pointer;font-weight:700">×</span></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;gap:8px">
+                <input value="{{ newFieldCategory }}" onChange="{{ onNewFieldCategory }}" placeholder="{{ t.nameEn }} *" style="flex:1;border:1px solid #E6E1DB;border-radius:8px;padding:9px 12px;font-size:13px"/>
+                <input value="{{ newFieldCategoryAr }}" onChange="{{ onNewFieldCategoryAr }}" placeholder="{{ t.nameAr }} *" dir="rtl" style="flex:1;border:1px solid #E6E1DB;border-radius:8px;padding:9px 12px;font-size:13px"/>
+                <div onClick="{{ onAddCategory }}" style="padding:9px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:#171412;color:#fff;white-space:nowrap">{{ t.addCategory }}</div>
+              </div>
+              <sc-if value="{{ categoryFormError }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;color:#B71822;font-weight:600;margin-top:8px">{{ t.requiredEnAr }}</div>
+              </sc-if>
+            </div>
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:20px">
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:12px">{{ t.ticketType }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+                <sc-for list="{{ ticketTypes }}" as="ty" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:7px;background:#F7F5F3;border-radius:7px;padding:7px 11px;font-size:12.5px">{{ ty.label }}<span onClick="{{ ty.onDelete }}" style="color:#B71822;cursor:pointer;font-weight:700">×</span></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;gap:8px">
+                <input value="{{ newFieldType }}" onChange="{{ onNewFieldType }}" placeholder="{{ t.nameEn }} *" style="flex:1;border:1px solid #E6E1DB;border-radius:8px;padding:9px 12px;font-size:13px"/>
+                <input value="{{ newFieldTypeAr }}" onChange="{{ onNewFieldTypeAr }}" placeholder="{{ t.nameAr }} *" dir="rtl" style="flex:1;border:1px solid #E6E1DB;border-radius:8px;padding:9px 12px;font-size:13px"/>
+                <div onClick="{{ onAddType }}" style="padding:9px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:#171412;color:#fff;white-space:nowrap">{{ t.addType }}</div>
+              </div>
+              <sc-if value="{{ typeFormError }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;color:#B71822;font-weight:600;margin-top:8px">{{ t.requiredEnAr }}</div>
+              </sc-if>
+            </div>
+            <div style="background:#fff;border:1px solid #E6E1DB;border-radius:12px;padding:20px">
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:12px">{{ t.filterPriority }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+                <sc-for list="{{ priorities }}" as="p" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:7px;background:#F7F5F3;border-radius:7px;padding:7px 11px;font-size:12.5px">{{ p.label }}<span onClick="{{ p.onDelete }}" style="color:#B71822;cursor:pointer;font-weight:700">×</span></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;gap:8px">
+                <input value="{{ newFieldPriority }}" onChange="{{ onNewFieldPriority }}" placeholder="{{ t.nameEn }} *" style="flex:1;border:1px solid #E6E1DB;border-radius:8px;padding:9px 12px;font-size:13px"/>
+                <input value="{{ newFieldPriorityAr }}" onChange="{{ onNewFieldPriorityAr }}" placeholder="{{ t.nameAr }} *" dir="rtl" style="flex:1;border:1px solid #E6E1DB;border-radius:8px;padding:9px 12px;font-size:13px"/>
+                <div onClick="{{ onAddPriority }}" style="padding:9px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:#171412;color:#fff;white-space:nowrap">{{ t.addPriority }}</div>
+              </div>
+              <sc-if value="{{ priorityFormError }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;color:#B71822;font-weight:600;margin-top:8px">{{ t.requiredEnAr }}</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ isLoggedIn }}" hint-placeholder-val="{{ true }}">
+</sc-if>
+
+<sc-if value="{{ showLogin }}" hint-placeholder-val="{{ true }}">
+  <div dir="{{ dir }}" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#171412;padding:24px">
+    <div style="width:100%;max-width:380px;background:#fff;border-radius:16px;padding:34px 30px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="width:56px;height:56px;border-radius:14px;background:#D81E27;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#fff">AH</div>
+        <div style="font-size:16px;font-weight:700;text-align:center">{{ t.appName }}</div>
+        <div style="font-size:12px;color:#9A928A">Al Hamra Restaurant</div>
+      </div>
+      <select value="{{ lang }}" onChange="{{ onLangChange }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:9px 11px;font-size:13px">
+        <option value="en">English</option>
+        <option value="ar">العربية</option>
+        <option value="ur">اردو</option>
+        <option value="bn">বাংলা</option>
+      </select>
+      <div>
+        <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:6px">{{ t.username }}</div>
+        <input value="{{ loginUsername }}" onChange="{{ onLoginUsernameChange }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:11px 13px;font-size:13.5px"/>
+      </div>
+      <div>
+        <div style="font-size:11.5px;font-weight:700;color:#736C64;margin-bottom:6px">{{ t.password }}</div>
+        <input type="password" value="{{ loginPassword }}" onChange="{{ onLoginPasswordChange }}" style="width:100%;border:1px solid #E6E1DB;border-radius:8px;padding:11px 13px;font-size:13.5px"/>
+      </div>
+      <sc-if value="{{ hasLoginError }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12px;color:#B71822;font-weight:600">{{ t.invalidCredentials }}</div>
+      </sc-if>
+      <div onClick="{{ onLogin }}" style="padding:12px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;background:#D81E27;color:#fff;text-align:center">{{ t.login }}</div>
+    </div>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  static STATUSES = [
+    {id:'under_maintenance', en:'Under Maintenance', ar:'قيد الصيانة', ur:'زیر مرمت', bn:'মেরামতাধীন', fg:'#92600E', bg:'#FCF0DC'},
+    {id:'maintenance_completed', en:'Maintenance Completed', ar:'تمت الصيانة', ur:'مرمت مکمل', bn:'মেরামত সম্পন্ন', fg:'#146B63', bg:'#E1F2EF'},
+    {id:'waiting_parts', en:'Waiting for Parts', ar:'في انتظار قطع الغيار', ur:'پرزوں کا انتظار', bn:'যন্ত্রাংশের জন্য অপেক্ষা', fg:'#2A5D8C', bg:'#E4EEF7'},
+    {id:'waiting_supplier', en:'Waiting for Supplier/Agent', ar:'في انتظار المورد', ur:'سپلائر کا انتظار', bn:'সরবরাহকারীর জন্য অপেক্ষা', fg:'#5B3E96', bg:'#EEE7F7'},
+    {id:'beyond_repair', en:'Beyond Repair', ar:'غير قابل للإصلاح', ur:'ناقابل مرمت', bn:'মেরামতের অতীত', fg:'#8C1015', bg:'#F8E2E3'},
+    {id:'solved', en:'Solved', ar:'تم الحل', ur:'حل ہو گیا', bn:'সমাধান হয়েছে', fg:'#1F7A3E', bg:'#E4F5E8'}
+  ];
+  static T = {
+    en:{appName:'Al Hamra Maintenance', login:'Log In', username:'Username', password:'Password', quickLogin:'Quick demo login', invalidCredentials:'Invalid username or password', dashboard:'Dashboard', allTickets:'All Tickets', myTickets:'My Tickets', newTicket:'New Ticket', branches:'Branches', usersRoles:'Users & Roles', ticketFields:'Ticket Fields', logout:'Log Out', search:'Search', filterStatus:'Status', filterPriority:'Priority', filterCategory:'Category', filterBranch:'Branch', allOption:'All', noTicketsFound:'No tickets found', tryAdjusting:'Try adjusting your filters or search', subject:'Subject', description:'Description', ticketType:'Ticket Type', attachments:'Attachments', takePhoto:'Camera', uploadFile:'Upload', submitTicket:'Submit Ticket', cancel:'Cancel', comments:'Comments', addComment:'Add a comment', post:'Post', createdBy:'Created by', createdOn:'Created on', changeStatus:'Change status', byStatus:'Tickets by Status', byPriority:'Tickets by Priority', byType:'Tickets by Type', byBranch:'Tickets by Branch', aiInsights:'AI Insights', welcomeBack:'Welcome back', manageBranches:'Manage Branches', addBranch:'Add Branch', manageUsers:'Manage Users', addUser:'Add User', role:'Role', addCategory:'Add Category', addType:'Add Type', addPriority:'Add Priority', delete:'Delete', yourBranch:'Your branch', back:'Back', r7:'7d', r30:'30d', r90:'90d', rAll:'All', notifications:'Notifications', markAllRead:'Mark all read', noNotifications:'No notifications yet', notifCreated:'New ticket submitted', notifStatus:'Ticket status updated', notifComment:'New comment added', assignedTo:'Assigned to', unassigned:'Unassigned', activityLog:'Activity Log', logCreated:'created this ticket', logStatus:'changed status to', logComment:'commented', logAssigned:'assigned this ticket to', logUnassigned:'unassigned this ticket', branchNameEn:'Branch Name (English)', branchNameAr:'Branch Name (Arabic)', nameEn:'Name (English)', nameAr:'Name (Arabic)', requiredEnAr:'English and Arabic names are required', exportReport:'Export Report', userPerformance:'User Performance', assignedTickets:'Assigned Tickets', avgResolution:'Avg. Resolution Time', evaluation:'Evaluation', evalExcellent:'Excellent', evalGood:'Good', evalNeedsImprovement:'Needs Improvement', evalNoData:'No data', notResolved:'In progress', noResponseYet:'No response yet', csvTicketNumber:'Ticket Number', csvBranch:'Branch', csvCreated:'Time Created', csvResponse:'Time of Response', csvResponseUser:'User Response', csvResolveTime:'Total Time to Resolve', exportByTickets:'Export by Tickets', exportByUsers:'Export by Users', csvAssignedTickets:'Assigned Tickets', csvAvgResolution:'Avg. Resolution Time', csvEvaluation:'Evaluation'},
+    ar:{appName:'الحمراء البخاري قسم الصيانه', login:'تسجيل الدخول', username:'اسم المستخدم', password:'كلمة المرور', quickLogin:'تسجيل دخول سريع (تجريبي)', invalidCredentials:'اسم المستخدم أو كلمة المرور غير صحيحة', dashboard:'لوحة التحكم', allTickets:'جميع التذاكر', myTickets:'تذاكري', newTicket:'تذكرة جديدة', branches:'الفروع', usersRoles:'المستخدمون والأدوار', ticketFields:'حقول التذكرة', logout:'تسجيل الخروج', search:'بحث', filterStatus:'الحالة', filterPriority:'الأولوية', filterCategory:'الفئة', filterBranch:'الفرع', allOption:'الكل', noTicketsFound:'لا توجد تذاكر', tryAdjusting:'حاول تعديل عوامل التصفية أو البحث', subject:'الموضوع', description:'الوصف', ticketType:'نوع التذكرة', attachments:'المرفقات', takePhoto:'الكاميرا', uploadFile:'تحميل', submitTicket:'إرسال التذكرة', cancel:'إلغاء', comments:'التعليقات', addComment:'أضف تعليقًا', post:'نشر', createdBy:'أنشأ بواسطة', createdOn:'تاريخ الإنشاء', changeStatus:'تغيير الحالة', byStatus:'التذاكر حسب الحالة', byPriority:'التذاكر حسب الأولوية', byType:'التذاكر حسب النوع', byBranch:'التذاكر حسب الفرع', aiInsights:'رؤى الذكاء الاصطناعي', welcomeBack:'مرحبًا بعودتك', manageBranches:'إدارة الفروع', addBranch:'إضافة فرع', manageUsers:'إدارة المستخدمين', addUser:'إضافة مستخدم', role:'الدور', addCategory:'إضافة فئة', addType:'إضافة نوع', addPriority:'إضافة أولوية', delete:'حذف', yourBranch:'فرعك', back:'رجوع', r7:'٧ أيام', r30:'٣٠ يوم', r90:'٩٠ يوم', rAll:'الكل'},
+    ur:{appName:'الحمرا مینٹیننس', login:'لاگ ان', username:'صارف نام', password:'پاس ورڈ', quickLogin:'فوری ڈیمو لاگ ان', invalidCredentials:'غلط صارف نام یا پاس ورڈ', dashboard:'ڈیش بورڈ', allTickets:'تمام ٹکٹس', myTickets:'میرے ٹکٹس', newTicket:'نیا ٹکٹ', branches:'شاخیں', usersRoles:'صارفین اور کردار', ticketFields:'ٹکٹ فیلڈز', logout:'لاگ آؤٹ', search:'تلاش', filterStatus:'حیثیت', filterPriority:'ترجیح', filterCategory:'قسم', filterBranch:'شاخ', allOption:'تمام', noTicketsFound:'کوئی ٹکٹ نہیں ملا', tryAdjusting:'فلٹرز یا تلاش تبدیل کرکے دیکھیں', subject:'موضوع', description:'تفصیل', ticketType:'ٹکٹ کی قسم', attachments:'منسلکات', takePhoto:'کیمرہ', uploadFile:'اپ لوڈ', submitTicket:'ٹکٹ جمع کریں', cancel:'منسوخ کریں', comments:'تبصرے', addComment:'تبصرہ شامل کریں', post:'پوسٹ کریں', createdBy:'بنانے والا', createdOn:'تاریخ تخلیق', changeStatus:'حیثیت تبدیل کریں', byStatus:'حیثیت کے لحاظ سے ٹکٹس', byPriority:'ترجیح کے لحاظ سے ٹکٹس', byType:'قسم کے لحاظ سے ٹکٹس', byBranch:'شاخ کے لحاظ سے ٹکٹس', aiInsights:'AI بصیرت', welcomeBack:'خوش آمدید', manageBranches:'شاخوں کا انتظام', addBranch:'شاخ شامل کریں', manageUsers:'صارفین کا انتظام', addUser:'صارف شامل کریں', role:'کردار', addCategory:'قسم شامل کریں', addType:'قسم شامل کریں', addPriority:'ترجیح شامل کریں', delete:'حذف کریں', yourBranch:'آپ کی شاخ', back:'واپس', r7:'٧ دن', r30:'٣٠ دن', r90:'٩٠ دن', rAll:'تمام'},
+    bn:{appName:'আল হামরা মেইনটেন্যান্স', login:'লগ ইন', username:'ইউজারনেম', password:'পাসওয়ার্ড', quickLogin:'কুইক ডেমো লগইন', invalidCredentials:'ভুল ইউজারনেম বা পাসওয়ার্ড', dashboard:'ড্যাশবোর্ড', allTickets:'সব টিকিট', myTickets:'আমার টিকিট', newTicket:'নতুন টিকিট', branches:'শাখা', usersRoles:'ব্যবহারকারী ও ভূমিকা', ticketFields:'টিকিট ফিল্ড', logout:'লগ আউট', search:'সার্চ', filterStatus:'অবস্থা', filterPriority:'অগ্রাধিকার', filterCategory:'বিভাগ', filterBranch:'শাখা', allOption:'সব', noTicketsFound:'কোনো টিকিট পাওয়া যায়নি', tryAdjusting:'ফিল্টার বা সার্চ পরিবর্তন করে দেখুন', subject:'বিষয়', description:'বিবরণ', ticketType:'টিকিটের ধরন', attachments:'সংযুক্তি', takePhoto:'ক্যামেরা', uploadFile:'আপলোড', submitTicket:'টিকিট জমা দিন', cancel:'বাতিল', comments:'মন্তব্য', addComment:'মন্তব্য যুক্ত করুন', post:'পোস্ট', createdBy:'তৈরি করেছেন', createdOn:'তৈরির তারিখ', changeStatus:'অবস্থা পরিবর্তন করুন', byStatus:'অবস্থা অনুযায়ী টিকিট', byPriority:'অগ্রাধিকার অনুযায়ী টিকিট', byType:'ধরন অনুযায়ী টিকিট', byBranch:'শাখা অনুযায়ী টিকিট', aiInsights:'AI ইনসাইট', welcomeBack:'পুনরায় স্বাগতম', manageBranches:'শাখা ব্যবস্থাপনা', addBranch:'শাখা যুক্ত করুন', manageUsers:'ব্যবহারকারী ব্যবস্থাপনা', addUser:'ব্যবহারকারী যুক্ত করুন', role:'ভূমিকা', addCategory:'বিভাগ যুক্ত করুন', addType:'ধরন যুক্ত করুন', addPriority:'অগ্রাধিকার যুক্ত করুন', delete:'মুছুন', yourBranch:'আপনার শাখা', back:'পিছনে', r7:'৭দ', r30:'৩০দ', r90:'৯০দ', rAll:'সব'}
+  };
+
+  constructor(props){
+    super(props);
+    const cats = ['Air Conditioning','Refrigeration','Electrical','Plumbing','Lighting','Tiles / Marble / Ceramic','Planters','Gypsum Board','Walls','Doors','Glass','Equipment','Gas','Signage / Boards','Exhaust Hood / Chimney','Water','Fire Alarm & Extinguishers','Other'];
+    const catAr = ['تكييف الهواء','التبريد','كهرباء','سباكة','إضاءة','بلاط / رخام / سيراميك','نباتات وأحواض','ألواح جبسية','جدران','أبواب','زجاج','معدات','غاز','لوحات / يافطات','شفاط / مدخنة','مياه','إنذار وطفايات الحريق','أخرى'];
+    const catUr = ['ایئر کنڈیشننگ','ریفریجریشن','بجلی','پلمبنگ','روشنی','ٹائلز / ماربل / سیرامک','پودے اور گملے','جپسم بورڈ','دیواریں','دروازے','شیشہ','آلات','گیس','سائن بورڈ','ایگزاسٹ ہڈ / چمنی','پانی','فائر الارم اور آگ بجھانے کے آلات','دیگر'];
+    const catBn = ['এয়ার কন্ডিশনিং','রেফ্রিজারেশন','বিদ্যুৎ','প্লাম্বিং','লাইটিং','টাইলস / মার্বেল / সিরামিক','গাছপালা ও টব','জিপসাম বোর্ড','দেয়াল','দরজা','কাচ','সরঞ্জাম','গ্যাস','সাইনবোর্ড','এক্সহস্ট হুড / চিমনি','পানি','ফায়ার অ্যালার্ম ও অগ্নি নির্বাপক','অন্যান্য'];
+    const categories = cats.map((c,i)=>({id:'c'+(i+1), en:c, ar:catAr[i], ur:catUr[i], bn:catBn[i]}));
+    const ticketTypes = [
+      {id:'maintenance_request', en:'Maintenance Request', ar:'طلب صيانة', ur:'مرمت کی درخواست', bn:'মেরামতের অনুরোধ'},
+      {id:'issue_report', en:'Issue Report', ar:'تقرير عن مشكلة', ur:'مسئلے کی رپورٹ', bn:'সমস্যার প্রতিবেদন'}
+    ];
+    const priorities = [
+      {id:'urgent', en:'Urgent', ar:'عاجل', ur:'فوری', bn:'জরুরি', fg:'#B7141C', bg:'#FBE4E5'},
+      {id:'important', en:'Important', ar:'مهم', ur:'اہم', bn:'গুরুত্বপূর্ণ', fg:'#B15A12', bg:'#FBEADD'},
+      {id:'medium', en:'Medium', ar:'متوسط', ur:'درمیانہ', bn:'মাঝারি', fg:'#92730E', bg:'#FBF2D8'},
+      {id:'normal', en:'Normal', ar:'عادي', ur:'معمولی', bn:'সাধারণ', fg:'#6B6560', bg:'#EFEDEA'}
+    ];
+    const branches = [
+      {id:'b1', name:'Suwaidi', nameAr:'السويدي', username:'suwaidi', password:'Suwaidi26!'},
+      {id:'b2', name:'Hazm', nameAr:'الحزم', username:'hazm', password:'Hazm2026!'},
+      {id:'b3', name:'Narjis', nameAr:'النرجس', username:'narjis', password:'Narjis26!'},
+      {id:'b4', name:'Dammam Road', nameAr:'طريق الدمام', username:'dammamroad', password:'Dammam26!'},
+      {id:'b5', name:'Khaled Bin Waleed', nameAr:'خالد بن الوليد', username:'khaledbinwaleed', password:'Khaled26!'},
+      {id:'b6', name:'Mansourah', nameAr:'المنصورة', username:'mansourah', password:'Mansour26!'},
+      {id:'b7', name:'Khurais Road', nameAr:'طريق خريص', username:'khuraisroad', password:'Khurais26!'},
+      {id:'b8', name:'Malqa', nameAr:'الملقا', username:'malqa', password:'Malqa2026!'},
+      {id:'b9', name:'Aqiq', nameAr:'العقيق', username:'aqiq', password:'Aqiq2026!'},
+      {id:'b10', name:'Sulaimaniyah', nameAr:'السليمانية', username:'sulaimaniyah', password:'Sulaim26!'},
+      {id:'b11', name:'Laban', nameAr:'لبن', username:'laban', password:'Laban2026!'},
+      {id:'b12', name:'Rimal', nameAr:'الرمال', username:'rimal', password:'Rimal2026!'},
+      {id:'b13', name:'Diriyah', nameAr:'الدرعية', username:'diriyah', password:'Diriyah26!'},
+      {id:'b14', name:'Thumamah', nameAr:'الثمامة', username:'thumamah', password:'Thumam26!'},
+      {id:'b15', name:'Takhassusi', nameAr:'التخصصي', username:'takhassusi', password:'Takhas26!'},
+      {id:'b16', name:'Arid', nameAr:'العارض', username:'arid', password:'Arid2026!'}
+    ];
+    const users = [
+      {id:'u1', name:'Shady Obiedy', username:'techasus', password:'Techasus26!', role:'Super Admin'},
+      {id:'u2', name:'Abdulhadi Jora', username:'ajora', password:'Ajora2026!', role:'Supervisor'},
+      {id:'u3', name:'Mohammed Osama', username:'mosama', password:'Mosama26!', role:'Maintenance Manager'},
+      {id:'u4', name:'Mohamed Abul Kalam', username:'mabulkalam', password:'Kalam2026!', role:'Supervisor'},
+      {id:'u5', name:'Mohamed Soujoun', username:'msoujoun', password:'Soujoun26!', role:'Supervisor'},
+      {id:'u6', name:'Mohamed Ramez', username:'mramez', password:'Ramez2026!', role:'Supervisor'}
+    ];
+    const tk = (id,branchId,type,cat,pri,status,subject,desc,date,attachments,comments,assigneeId,extraLogRel)=>{
+      const createdMs = new Date(date).getTime();
+      const log = [{author:'System',text:'created this ticket',at:date}];
+      (extraLogRel||[]).forEach(([hrs,author,text])=>{ log.push({author,text,at:new Date(createdMs+hrs*3600000).toISOString()}); });
+      return {id,branchId,type,categoryId:cat,priorityId:pri,statusId:status,subject,description:desc,createdAt:date,attachments:attachments||[],comments:comments||[],assigneeId:assigneeId||null,log};
+    };
+    const tickets = [
+      tk('T-1015','b1','maintenance_request','c1','urgent','under_maintenance','AC unit not cooling in main dining hall','Main dining hall AC compressor stopped cooling since this morning, guests complaining of heat.','2026-08-09',[{name:'photo_1'}],[{author:'Suwaidi Staff',text:'Technician dispatched, ETA 2pm.',at:'2026-08-09T11:20:00'}],'u3',[[1,'Abdulhadi Jora','assigned this ticket to Abdulhadi Jora'],[1.2,'Abdulhadi Jora','started investigating']]),
+      tk('T-1014','b2','issue_report','c4','important','waiting_parts','Kitchen sink drain leaking under counter','Leak under prep sink is pooling water, waiting on replacement trap part.','2026-08-05',[],[],'u2',[[3,'Mohammed Osama','responded to ticket']]),
+      tk('T-1013','b3','maintenance_request','c3','urgent','under_maintenance','Power tripping in walk-in freezer circuit','Breaker for walk-in freezer trips every few hours, food safety risk.','2026-07-28',[{name:'photo_1'},{name:'photo_2'}],[{author:'Mohammed Osama',text:'Electrician on site now.',at:'2026-07-28T15:00:00'}],'u3',[[0.5,'Abdulhadi Jora','responded to ticket']]),
+      tk('T-1012','b1','maintenance_request','c2','important','waiting_supplier','Walk-in chiller compressor humming loudly','Compressor noise increased over the week, supplier called for inspection.','2026-07-20',[],[],'u2',[[2,'Mohammed Osama','responded to ticket']]),
+      tk('T-1011','b4','issue_report','c5','normal','maintenance_completed','Flickering lights in dining area','Two ceiling fixtures flickering, replaced ballast.','2026-07-15',[],[],'u3',[[4,'Abdulhadi Jora','responded to ticket'],[30,'Abdulhadi Jora','changed status to Maintenance Completed']]),
+      tk('T-1010','b5','maintenance_request','c10','medium','solved','Front entrance door not closing fully','Door hinge adjusted and closer replaced.','2026-07-02',[],[],'u2',[[2,'Mohammed Osama','responded to ticket'],[20,'Mohammed Osama','changed status to Solved']]),
+      tk('T-1009','b2','issue_report','c13','urgent','beyond_repair','Gas line valve corroded beyond repair','Valve corrosion confirmed by technician, unit needs full replacement.','2026-06-20',[{name:'photo_1'}],[],'u3',[[6,'Abdulhadi Jora','responded to ticket'],[48,'Abdulhadi Jora','changed status to Beyond Repair']]),
+      tk('T-1008','b3','maintenance_request','c6','medium','under_maintenance','Cracked floor tiles near service entrance','Several tiles cracked from heavy trolley traffic.','2026-06-10',[],[],'u2',[[5,'Mohammed Osama','responded to ticket']]),
+      tk('T-1007','b1','issue_report','c17','urgent','solved','Fire alarm panel showing fault code','Panel fault cleared after sensor cleaning and reset.','2026-05-25',[],[],'u3',[[1,'Abdulhadi Jora','responded to ticket'],[18,'Abdulhadi Jora','changed status to Solved']]),
+      tk('T-1006','b4','maintenance_request','c11','normal','maintenance_completed','Glass partition scratched in seating area','Partition polished, scratch minimized.','2026-05-05',[],[],'u2',[[3,'Mohammed Osama','responded to ticket'],[26,'Mohammed Osama','changed status to Maintenance Completed']]),
+      tk('T-1005','b5','issue_report','c12','important','waiting_parts','Dishwasher not heating water','Heating element suspected faulty, awaiting replacement.','2026-04-15',[],[],'u3',[[2,'Abdulhadi Jora','responded to ticket']]),
+      tk('T-1004','b2','maintenance_request','c9','normal','solved','Wall paint peeling near dish pit','Repainted and sealed.','2026-03-10',[],[],'u2',[[1,'Mohammed Osama','responded to ticket'],[15,'Mohammed Osama','changed status to Solved']]),
+      tk('T-1003','b3','issue_report','c8','medium','maintenance_completed','Gypsum ceiling water stain','Roof leak fixed and ceiling patched.','2026-02-01',[],[],'u3',[[4,'Abdulhadi Jora','responded to ticket'],[22,'Abdulhadi Jora','changed status to Maintenance Completed']]),
+      tk('T-1002','b1','maintenance_request','c16','important','under_maintenance','Low water pressure in kitchen taps','Pressure regulator being inspected.','2025-12-05',[],[],'u2',[[2,'Mohammed Osama','responded to ticket']])
+    ];
+    this.state = {
+      lang:'en', dir:'ltr', screen:'login', loginUsername:'', loginPassword:'', loginError:'',
+      currentAccountId:null, view:'dashboard', selectedTicketId:null,
+      filters:{status:'all',priority:'all',category:'all',branch:'all',search:''},
+      dashRange:'30', newComment:'',
+      newBranchName:'', newBranchNameAr:'', newBranchUser:'', newBranchPass:'', branchFormError:false,
+      newUserName:'', newUserUsername:'', newUserPass:'', newUserRole:'Maintenance Manager',
+      newFieldCategory:'', newFieldCategoryAr:'', categoryFormError:false,
+      newFieldType:'', newFieldTypeAr:'', typeFormError:false,
+      newFieldPriority:'', newFieldPriorityAr:'', priorityFormError:false,
+      showNotifications:false,
+      ticketForm:{type:'maintenance_request', priority:'', category:'', subject:'', description:'', attachments:[]},
+      branches, users, categories, ticketTypes, priorities, tickets,
+      notifications: []
+    };
+  }
+
+  t(key){ const d = Component.T[this.state.lang] || Component.T.en; return d[key] ?? Component.T.en[key] ?? key; }
+  label(list,id){ const it = list.find(x=>x.id===id); if(!it) return id; return it[this.state.lang] || it.en; }
+  fmtDate(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString(this.state.lang==='ar'?'ar-AE':this.state.lang==='ur'?'ur-PK':this.state.lang==='bn'?'bn-BD':'en-US', {year:'numeric',month:'short',day:'numeric'});
+  }
+  accounts(){
+    const branchAccounts = this.state.branches.map(b=>({id:'branch:'+b.id, name:b.name, username:b.username, password:b.password, role:'Branch Staff', branchId:b.id}));
+    const userAccounts = this.state.users.map(u=>({id:'user:'+u.id, name:u.name, username:u.username, password:u.password, role:u.role, branchId:null}));
+    return userAccounts.concat(branchAccounts);
+  }
+  getAccount(id){ return this.accounts().find(a=>a.id===id); }
+  roleLabelFor(role){
+    const map = {en:{}, ar:{'Super Admin':'مدير عام','Maintenance Manager':'مدير الصيانة','Supervisor':'مشرف','Branch Staff':'موظف فرع','Read Only':'مشاهدة فقط'}, ur:{'Super Admin':'سپر ایڈمن','Maintenance Manager':'مینٹیننس منیجر','Supervisor':'سپروائزر','Branch Staff':'برانچ اسٹاف','Read Only':'صرف دیکھنے'}, bn:{'Super Admin':'সুপার অ্যাডমিন','Maintenance Manager':'মেইনটেন্যান্স ম্যানেজার','Supervisor':'সুপারভাইজার','Branch Staff':'ব্রাঞ্চ স্টাফ','Read Only':'শুধু দেখা'}};
+    return (map[this.state.lang] && map[this.state.lang][role]) || role;
+  }
+
+  onLangChange(e){ const l = e.target.value; this.setState({lang:l, dir:(l==='ar'||l==='ur')?'rtl':'ltr'}); }
+  onLoginUsernameChange(e){ this.setState({loginUsername:e.target.value}); }
+  onLoginPasswordChange(e){ this.setState({loginPassword:e.target.value}); }
+  onLogin(){
+    const u = this.state.loginUsername.trim().toLowerCase();
+    const acc = this.accounts().find(a=>a.username.toLowerCase()===u);
+    if(!acc || acc.password !== this.state.loginPassword){ this.setState({loginError:'invalid'}); return; }
+    this.setState({screen:'app', currentAccountId:acc.id, loginError:'', view: acc.role==='Branch Staff' ? 'tickets' : 'dashboard', selectedTicketId:null});
+  }
+  quickLogin(accId){
+    const acc = this.getAccount(accId);
+    this.setState({screen:'app', currentAccountId:accId, loginError:'', view: acc && acc.role==='Branch Staff' ? 'tickets' : 'dashboard', selectedTicketId:null});
+  }
+  logout(){ this.setState({screen:'login', currentAccountId:null, loginUsername:'', loginPassword:'', loginError:''}); }
+  onSwitchAccount(e){
+    const acc = this.getAccount(e.target.value);
+    this.setState({currentAccountId:e.target.value, view: acc && acc.role==='Branch Staff' ? 'tickets' : 'dashboard', selectedTicketId:null});
+  }
+  setView(v){ this.setState({view:v, selectedTicketId:v==='ticketDetail'?this.state.selectedTicketId:null}); }
+  goToNewTicket(){ this.setState({view:'newTicket', selectedTicketId:null}); }
+  selectTicket(id){ this.setState({selectedTicketId:id, view:'ticketDetail'}); }
+  onBackToList(){ this.setState({view:'tickets', selectedTicketId:null}); }
+  onSetDashRange(r){ this.setState({dashRange:r}); }
+  fmtDateTime(iso){
+    const d = new Date(iso);
+    return d.toLocaleString(this.state.lang==='ar'?'ar-AE':this.state.lang==='ur'?'ur-PK':this.state.lang==='bn'?'bn-BD':'en-US', {year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  }
+  fmtDuration(hours){
+    if(hours==null) return null;
+    if(hours < 24) return Math.round(hours*10)/10 + 'h';
+    const days = Math.floor(hours/24); const rem = Math.round(hours - days*24);
+    return days+'d '+rem+'h';
+  }
+  ticketTiming(tk){
+    const RESOLVED = ['solved','maintenance_completed','beyond_repair'];
+    const createdMs = new Date(tk.createdAt).getTime();
+    const responseEntry = tk.log.slice(1).find(l=>l.author!=='System');
+    const responseAt = responseEntry ? responseEntry.at : null;
+    const responseBy = responseEntry ? responseEntry.author : null;
+    const responseHours = responseAt ? (new Date(responseAt).getTime()-createdMs)/3600000 : null;
+    let resolvedAt = null;
+    if(RESOLVED.includes(tk.statusId)){
+      const statusEntries = tk.log.filter(l=>l.text && l.text.indexOf('changed status to')===0);
+      resolvedAt = statusEntries.length ? statusEntries[statusEntries.length-1].at : null;
+    }
+    const resolveHours = resolvedAt ? (new Date(resolvedAt).getTime()-createdMs)/3600000 : null;
+    return {responseAt, responseBy, responseHours, resolvedAt, resolveHours};
+  }
+  rangeScopedTickets(){
+    const s = this.state;
+    const rangeDays = s.dashRange==='7'?7:s.dashRange==='30'?30:s.dashRange==='90'?90:null;
+    const now = new Date('2026-08-11');
+    const inRange = (iso)=>{ if(!rangeDays) return true; return (now-new Date(iso))/(1000*3600*24) <= rangeDays; };
+    const acc = this.getAccount(s.currentAccountId);
+    const scoped = acc && acc.role==='Branch Staff' ? s.tickets.filter(tk=>tk.branchId===acc.branchId) : s.tickets;
+    return scoped.filter(tk=>inRange(tk.createdAt));
+  }
+  downloadCsv(filename, lines){
+    const blob = new Blob(['\uFEFF'+lines.join('\r\n')], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  onExportTicketsReport(){
+    const s = this.state;
+    const rows = this.rangeScopedTickets();
+    const branchName = (id)=>{ const b=s.branches.find(x=>x.id===id); return b?b.name:id; };
+    const header = [this.t('csvTicketNumber'), this.t('csvBranch'), this.t('csvCreated'), this.t('csvResponse'), this.t('csvResponseUser'), this.t('csvResolveTime')];
+    const cell = (v)=> '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+    const lines = [header.join(',')];
+    rows.forEach(tk=>{
+      const timing = this.ticketTiming(tk);
+      lines.push([
+        cell(tk.id), cell(branchName(tk.branchId)), cell(this.fmtDateTime(tk.createdAt)),
+        cell(timing.responseAt ? this.fmtDateTime(timing.responseAt) : this.t('noResponseYet')),
+        cell(timing.responseBy || ''),
+        cell(timing.resolveHours!=null ? this.fmtDuration(timing.resolveHours) : this.t('notResolved'))
+      ].join(','));
+    });
+    this.downloadCsv('tickets-report-'+s.dashRange+'.csv', lines);
+  }
+  onExportUsersReport(){
+    const s = this.state;
+    const rows = this.rangeScopedTickets();
+    const cell = (v)=> '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+    const header = [this.t('csvResponseUser'), this.t('csvAssignedTickets'), this.t('csvAvgResolution'), this.t('csvEvaluation')];
+    const lines = [header.join(',')];
+    s.users.filter(u=>u.role!=='Read Only').forEach(u=>{
+      const assigned = rows.filter(tk=>tk.assigneeId===u.id);
+      const resolvedHoursList = assigned.map(tk=>this.ticketTiming(tk).resolveHours).filter(h=>h!=null);
+      const avg = resolvedHoursList.length ? resolvedHoursList.reduce((a,b)=>a+b,0)/resolvedHoursList.length : null;
+      let evalLabel;
+      if(avg==null) evalLabel=this.t('evalNoData');
+      else if(avg<24) evalLabel=this.t('evalExcellent');
+      else if(avg<48) evalLabel=this.t('evalGood');
+      else evalLabel=this.t('evalNeedsImprovement');
+      lines.push([cell(u.name), cell(assigned.length), cell(avg!=null?this.fmtDuration(avg):'—'), cell(evalLabel)].join(','));
+    });
+    this.downloadCsv('user-performance-report-'+s.dashRange+'.csv', lines);
+  }
+  onToggleNotifications(){ this.setState({showNotifications:!this.state.showNotifications}); }
+  onMarkAllRead(){ this.setState({notifications:this.state.notifications.map(n=>({...n, read:true}))}); }
+  openNotification(n){
+    this.setState({
+      notifications:this.state.notifications.map(x=>x.id===n.id?{...x,read:true}:x),
+      showNotifications:false, selectedTicketId:n.ticketId, view:'ticketDetail'
+    });
+  }
+
+  onSearchChange(e){ this.setState({filters:{...this.state.filters, search:e.target.value}}); }
+  onStatusFilterChange(e){ this.setState({filters:{...this.state.filters, status:e.target.value}}); }
+  onPriorityFilterChange(e){ this.setState({filters:{...this.state.filters, priority:e.target.value}}); }
+  onCategoryFilterChange(e){ this.setState({filters:{...this.state.filters, category:e.target.value}}); }
+  onBranchFilterChange(e){ this.setState({filters:{...this.state.filters, branch:e.target.value}}); }
+
+  onFormTypeChange(e){ this.setState({ticketForm:{...this.state.ticketForm, type:e.target.value}}); }
+  onFormPriorityChange(e){ this.setState({ticketForm:{...this.state.ticketForm, priority:e.target.value}}); }
+  onFormCategoryChange(e){ this.setState({ticketForm:{...this.state.ticketForm, category:e.target.value}}); }
+  onFormSubjectChange(e){ this.setState({ticketForm:{...this.state.ticketForm, subject:e.target.value}}); }
+  onFormDescriptionChange(e){ this.setState({ticketForm:{...this.state.ticketForm, description:e.target.value}}); }
+  onFileUpload(e){
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    this.setState({ticketForm:{...this.state.ticketForm, attachments:[...this.state.ticketForm.attachments, {name:f.name.slice(0,10)}]}});
+  }
+  onCancelNewTicket(){ this.setState({view:'dashboard', ticketForm:{type:'maintenance_request', priority:'', category:'', subject:'', description:'', attachments:[]}}); }
+  playNotifSound(){
+    try{
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = this._audioCtx || (this._audioCtx = new Ctx());
+      const t0 = ctx.currentTime;
+      [880, 1320].forEach((freq, i)=>{
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        osc.connect(gain); gain.connect(ctx.destination);
+        const start = t0 + i*0.11;
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(0.18, start+0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start+0.22);
+        osc.start(start); osc.stop(start+0.24);
+      });
+    }catch(e){}
+  }
+  pushNotification(n){
+    this.setState({notifications:[{id:'n'+Date.now()+Math.floor(Math.random()*999), read:false, at:new Date().toISOString(), ...n}, ...this.state.notifications]});
+    this.playNotifSound();
+  }
+  onSubmitTicket(){
+    const acc = this.getAccount(this.state.currentAccountId);
+    const f = this.state.ticketForm;
+    if(!f.subject || !f.category || !f.priority) return;
+    const nextNum = 1016 + this.state.tickets.length;
+    const newTicket = {
+      id:'T-'+nextNum, branchId: acc.branchId || (this.state.branches[0] && this.state.branches[0].id),
+      type:f.type, categoryId:f.category, priorityId:f.priority, statusId:'under_maintenance',
+      subject:f.subject, description:f.description, createdAt:new Date().toISOString().slice(0,10),
+      attachments:f.attachments, comments:[], createdByOverride:acc.name, assigneeId:null,
+      log:[{author:acc.name, text:'created this ticket', at:new Date().toISOString()}]
+    };
+    this.setState({
+      tickets:[newTicket, ...this.state.tickets],
+      ticketForm:{type:'maintenance_request', priority:'', category:'', subject:'', description:'', attachments:[]},
+      view: acc.role==='Branch Staff' ? 'tickets' : 'tickets'
+    });
+    this.pushNotification({kind:'created', ticketId:newTicket.id, title:'New ticket submitted', body:(acc.branchId?this.state.branches.find(b=>b.id===acc.branchId).name+' — ':'')+newTicket.subject});
+  }
+  onChangeStatus(e){
+    const acc = this.getAccount(this.state.currentAccountId);
+    const id = this.state.selectedTicketId;
+    const statusId = e.target.value;
+    const statusLabel = this.label(Component.STATUSES, statusId);
+    const now = new Date().toISOString();
+    this.setState({tickets:this.state.tickets.map(tk=> tk.id===id ? {...tk, statusId, log:[...tk.log, {author:acc.name, text:'changed status to '+statusLabel, at:now}]} : tk)});
+    const tk = this.state.tickets.find(x=>x.id===id);
+    this.pushNotification({kind:'status', ticketId:id, title:'Status updated to '+statusLabel, body:(tk?tk.subject:'')});
+  }
+  onNewCommentChange(e){ this.setState({newComment:e.target.value}); }
+  onPostComment(){
+    if(!this.state.newComment.trim()) return;
+    const acc = this.getAccount(this.state.currentAccountId);
+    const id = this.state.selectedTicketId;
+    const text = this.state.newComment;
+    const now = new Date().toISOString();
+    this.setState({
+      tickets:this.state.tickets.map(tk=> tk.id===id ? {...tk, comments:[...tk.comments, {author:acc.name, text, at:now}], log:[...tk.log, {author:acc.name, text:'commented: "'+text+'"', at:now}]} : tk),
+      newComment:''
+    });
+    this.pushNotification({kind:'comment', ticketId:id, title:'New comment from '+acc.name, body:'"'+text+'"'});
+  }
+  onAssignTicket(e){
+    const acc = this.getAccount(this.state.currentAccountId);
+    const id = this.state.selectedTicketId;
+    const userId = e.target.value || null;
+    const user = this.state.users.find(u=>u.id===userId);
+    const now = new Date().toISOString();
+    const logText = user ? 'assigned this ticket to '+user.name : 'unassigned this ticket';
+    this.setState({tickets:this.state.tickets.map(tk=> tk.id===id ? {...tk, assigneeId:userId, log:[...tk.log, {author:acc.name, text:logText, at:now}]} : tk)});
+    const tk = this.state.tickets.find(x=>x.id===id);
+    this.pushNotification({kind:'status', ticketId:id, title: user ? 'Ticket assigned to '+user.name : 'Ticket unassigned', body:(tk?tk.subject:'')});
+  }
+
+  onNewBranchName(e){ this.setState({newBranchName:e.target.value}); }
+  onNewBranchNameAr(e){ this.setState({newBranchNameAr:e.target.value}); }
+  onNewBranchUser(e){ this.setState({newBranchUser:e.target.value}); }
+  onNewBranchPass(e){ this.setState({newBranchPass:e.target.value}); }
+  onAddBranch(){
+    if(!this.state.newBranchName.trim() || !this.state.newBranchNameAr.trim() || !this.state.newBranchUser.trim()){
+      this.setState({branchFormError:true}); return;
+    }
+    const id = 'b'+(this.state.branches.length+1)+Math.floor(Math.random()*1000);
+    this.setState({branches:[...this.state.branches, {id, name:this.state.newBranchName, nameAr:this.state.newBranchNameAr, username:this.state.newBranchUser, password:this.state.newBranchPass||'1234'}], newBranchName:'', newBranchNameAr:'', newBranchUser:'', newBranchPass:'', branchFormError:false});
+  }
+  deleteBranch(id){ this.setState({branches:this.state.branches.filter(b=>b.id!==id)}); }
+
+  onNewUserName(e){ this.setState({newUserName:e.target.value}); }
+  onNewUserUsername(e){ this.setState({newUserUsername:e.target.value}); }
+  onNewUserPass(e){ this.setState({newUserPass:e.target.value}); }
+  onNewUserRole(e){ this.setState({newUserRole:e.target.value}); }
+  onAddUser(){
+    if(!this.state.newUserName || !this.state.newUserUsername) return;
+    const id = 'u'+(this.state.users.length+1)+Math.floor(Math.random()*1000);
+    this.setState({users:[...this.state.users, {id, name:this.state.newUserName, username:this.state.newUserUsername, password:this.state.newUserPass||'1234', role:this.state.newUserRole}], newUserName:'', newUserUsername:'', newUserPass:''});
+  }
+  deleteUser(id){ this.setState({users:this.state.users.filter(u=>u.id!==id)}); }
+
+  onNewFieldCategory(e){ this.setState({newFieldCategory:e.target.value}); }
+  onNewFieldCategoryAr(e){ this.setState({newFieldCategoryAr:e.target.value}); }
+  onAddCategory(){
+    if(!this.state.newFieldCategory.trim() || !this.state.newFieldCategoryAr.trim()){ this.setState({categoryFormError:true}); return; }
+    const id = 'c'+(this.state.categories.length+1)+Math.floor(Math.random()*1000);
+    this.setState({categories:[...this.state.categories, {id, en:this.state.newFieldCategory, ar:this.state.newFieldCategoryAr}], newFieldCategory:'', newFieldCategoryAr:'', categoryFormError:false});
+  }
+  deleteCategory(id){ this.setState({categories:this.state.categories.filter(c=>c.id!==id)}); }
+  onNewFieldType(e){ this.setState({newFieldType:e.target.value}); }
+  onNewFieldTypeAr(e){ this.setState({newFieldTypeAr:e.target.value}); }
+  onAddType(){
+    if(!this.state.newFieldType.trim() || !this.state.newFieldTypeAr.trim()){ this.setState({typeFormError:true}); return; }
+    const id = 'ty'+(this.state.ticketTypes.length+1)+Math.floor(Math.random()*1000);
+    this.setState({ticketTypes:[...this.state.ticketTypes, {id, en:this.state.newFieldType, ar:this.state.newFieldTypeAr}], newFieldType:'', newFieldTypeAr:'', typeFormError:false});
+  }
+  deleteType(id){ this.setState({ticketTypes:this.state.ticketTypes.filter(t=>t.id!==id)}); }
+  onNewFieldPriority(e){ this.setState({newFieldPriority:e.target.value}); }
+  onNewFieldPriorityAr(e){ this.setState({newFieldPriorityAr:e.target.value}); }
+  onAddPriority(){
+    if(!this.state.newFieldPriority.trim() || !this.state.newFieldPriorityAr.trim()){ this.setState({priorityFormError:true}); return; }
+    const id = 'p'+(this.state.priorities.length+1)+Math.floor(Math.random()*1000);
+    this.setState({priorities:[...this.state.priorities, {id, en:this.state.newFieldPriority, ar:this.state.newFieldPriorityAr, fg:'#6B6560', bg:'#EFEDEA'}], newFieldPriority:'', newFieldPriorityAr:'', priorityFormError:false});
+  }
+  deletePriority(id){ this.setState({priorities:this.state.priorities.filter(p=>p.id!==id)}); }
+
+  renderVals(){
+    const s = this.state;
+    const t = new Proxy({}, {get:(_,k)=>this.t(k)});
+    const acc = this.getAccount(s.currentAccountId);
+    const isLoggedIn = s.screen==='app' && !!acc;
+    const role = acc ? acc.role : null;
+    const canSeeAllTickets = role==='Super Admin'||role==='Maintenance Manager'||role==='Supervisor'||role==='Read Only';
+    const canSubmitTicket = role==='Super Admin'||role==='Maintenance Manager'||role==='Supervisor'||role==='Branch Staff';
+    const canChangeStatus = role==='Super Admin'||role==='Maintenance Manager'||role==='Supervisor';
+    const canComment = role && role!=='Read Only';
+    const canManageBranches = role==='Super Admin'||role==='Maintenance Manager';
+    const canManageUsers = role==='Super Admin';
+    const canManageFields = role==='Super Admin';
+
+    const branchName = (id)=>{ const b=s.branches.find(x=>x.id===id); return b?b.name:id; };
+
+    const navDefs = [
+      {key:'dashboard', label:t.dashboard, show: role==='Super Admin'||role==='Maintenance Manager'||role==='Supervisor'},
+      {key:'tickets', label: role==='Branch Staff' ? t.myTickets : t.allTickets, show:canSeeAllTickets||role==='Branch Staff'},
+      {key:'newTicket', label:t.newTicket, show:canSubmitTicket},
+      {key:'branches', label:t.branches, show:canManageBranches},
+      {key:'users', label:t.usersRoles, show:canManageUsers},
+      {key:'fields', label:t.ticketFields, show:canManageFields}
+    ];
+    const navItems = navDefs.filter(n=>n.show).map(n=>({label:n.label, activeColor: s.view===n.key ? '#D81E27' : 'transparent', onClick: ()=>this.setView(n.key)}));
+
+    const rangeDefs = [{k:'7',l:t.r7},{k:'30',l:t.r30},{k:'90',l:t.r90},{k:'all',l:t.rAll}];
+    const rangeOptions = rangeDefs.map(r=>({label:r.l, bg: s.dashRange===r.k?'#171412':'transparent', fg: s.dashRange===r.k?'#fff':'#736C64', onClick:()=>this.onSetDashRange(r.k)}));
+
+    const now = new Date('2026-08-11');
+    const rangeDays = s.dashRange==='7'?7:s.dashRange==='30'?30:s.dashRange==='90'?90:null;
+    const inRange = (iso)=>{ if(!rangeDays) return true; const d=new Date(iso); return (now-d)/(1000*3600*24) <= rangeDays; };
+    const scopedTickets = role==='Branch Staff' ? s.tickets.filter(tk=>tk.branchId===acc.branchId) : s.tickets;
+    const rangeTickets = scopedTickets.filter(tk=>inRange(tk.createdAt));
+
+    const statLabels = [
+      {key:'total', label:t.dashboard==='Dashboard'?'Total Tickets':t.dashboard, color:'#171412'},
+    ];
+    const openCount = rangeTickets.filter(tk=>tk.statusId!=='solved'&&tk.statusId!=='maintenance_completed'&&tk.statusId!=='beyond_repair').length;
+    const resolvedCount = rangeTickets.filter(tk=>tk.statusId==='solved'||tk.statusId==='maintenance_completed').length;
+    const urgentCount = rangeTickets.filter(tk=>tk.priorityId==='urgent').length;
+    const statCards = [
+      {label:'Total Tickets', value:rangeTickets.length, color:'#171412'},
+      {label:'Open', value:openCount, color:'#2A5D8C'},
+      {label:'Resolved', value:resolvedCount, color:'#1F7A3E'},
+      {label:'Urgent', value:urgentCount, color:'#B7141C'}
+    ];
+
+    const maxOr1 = (n)=> n>0?n:1;
+    const statusBars = Component.STATUSES.map(st=>{
+      const count = rangeTickets.filter(tk=>tk.statusId===st.id).length;
+      return {label:this.label(Component.STATUSES,st.id), count, color:st.fg, pct: Math.round(100*count/maxOr1(rangeTickets.length))+'%'};
+    });
+    const priorityBars = s.priorities.map(p=>{
+      const count = rangeTickets.filter(tk=>tk.priorityId===p.id).length;
+      return {label:this.label(s.priorities,p.id), count, color:p.fg, pct: Math.round(100*count/maxOr1(rangeTickets.length))+'%'};
+    });
+    const typeBars = s.ticketTypes.map(ty=>{
+      const count = rangeTickets.filter(tk=>tk.type===ty.id).length;
+      return {label:this.label(s.ticketTypes,ty.id), count, pct: Math.round(100*count/maxOr1(rangeTickets.length))+'%'};
+    });
+    const branchBars = s.branches.map(b=>{
+      const count = rangeTickets.filter(tk=>tk.branchId===b.id).length;
+      return {label:b.name, count, pct: Math.round(100*count/maxOr1(rangeTickets.length))+'%'};
+    }).filter(b=>role!=='Branch Staff' || true);
+
+    const assignableForPerf = s.users.filter(u=>u.role!=='Read Only');
+    const userPerformance = assignableForPerf.map(u=>{
+      const assigned = rangeTickets.filter(tk=>tk.assigneeId===u.id);
+      const resolvedHoursList = assigned.map(tk=>this.ticketTiming(tk).resolveHours).filter(h=>h!=null);
+      const avg = resolvedHoursList.length ? resolvedHoursList.reduce((a,b)=>a+b,0)/resolvedHoursList.length : null;
+      let evalLabel, evalFg, evalBg;
+      if(avg==null){ evalLabel=t.evalNoData; evalFg='#736C64'; evalBg='#F0EBE6'; }
+      else if(avg<24){ evalLabel=t.evalExcellent; evalFg='#1F7A3E'; evalBg='#E4F5E8'; }
+      else if(avg<48){ evalLabel=t.evalGood; evalFg='#2A5D8C'; evalBg='#E4EEF7'; }
+      else { evalLabel=t.evalNeedsImprovement; evalFg='#B7141C'; evalBg='#FBE4E5'; }
+      return {name:u.name, assignedCount:assigned.length, avgResolutionLabel: avg!=null ? this.fmtDuration(avg) : '—', evalLabel, evalFg, evalBg};
+    });
+
+    const insights = [
+      'Air Conditioning and Refrigeration tickets account for the largest share of urgent requests this quarter, concentrated at Downtown and Airport Road.',
+      'Tickets marked "Waiting for Supplier/Agent" take on average longer to close than any other status — consider pre-approving a backup vendor for chiller and compressor parts.',
+      'Marina branch has filed the most Issue Reports (as opposed to Maintenance Requests) — this may indicate reactive rather than scheduled upkeep.'
+    ];
+
+    let filteredTickets = scopedTickets.filter(tk=>{
+      if(s.filters.status!=='all' && tk.statusId!==s.filters.status) return false;
+      if(s.filters.priority!=='all' && tk.priorityId!==s.filters.priority) return false;
+      if(s.filters.category!=='all' && tk.categoryId!==s.filters.category) return false;
+      if(s.filters.branch!=='all' && tk.branchId!==s.filters.branch) return false;
+      if(s.filters.search && !tk.subject.toLowerCase().includes(s.filters.search.toLowerCase()) && !tk.id.toLowerCase().includes(s.filters.search.toLowerCase())) return false;
+      return true;
+    }).map(tk=>{
+      const st = Component.STATUSES.find(x=>x.id===tk.statusId);
+      const pr = s.priorities.find(x=>x.id===tk.priorityId);
+      return {
+        id:tk.id, subject:tk.subject, categoryLabel:this.label(s.categories,tk.categoryId), branchName:branchName(tk.branchId),
+        dateLabel:this.fmtDate(tk.createdAt), priorityLabel:this.label(s.priorities,tk.priorityId), priorityFg:pr?pr.fg:'#6B6560', priorityBg:pr?pr.bg:'#EFEDEA',
+        statusLabel:this.label(Component.STATUSES,tk.statusId), statusFg:st?st.fg:'#6B6560', statusBg:st?st.bg:'#EFEDEA',
+        onClick:()=>this.selectTicket(tk.id)
+      };
+    });
+
+    const selTk = s.tickets.find(tk=>tk.id===s.selectedTicketId);
+    let selectedTicket = null;
+    if(selTk){
+      const st = Component.STATUSES.find(x=>x.id===selTk.statusId);
+      const pr = s.priorities.find(x=>x.id===selTk.priorityId);
+      selectedTicket = {
+        id:selTk.id, subject:selTk.subject, description:selTk.description, statusId:selTk.statusId,
+        categoryLabel:this.label(s.categories,selTk.categoryId), branchName:branchName(selTk.branchId),
+        createdByName: selTk.createdByOverride || (branchName(selTk.branchId)+' Staff'), dateLabel:this.fmtDate(selTk.createdAt),
+        priorityLabel:this.label(s.priorities,selTk.priorityId), priorityFg:pr?pr.fg:'#6B6560', priorityBg:pr?pr.bg:'#EFEDEA',
+        statusLabel:this.label(Component.STATUSES,selTk.statusId), statusFg:st?st.fg:'#6B6560', statusBg:st?st.bg:'#EFEDEA',
+        hasAttachments: selTk.attachments.length>0, attachments:selTk.attachments,
+        comments: selTk.comments.map(c=>({author:c.author, text:c.text, dateLabel:this.fmtDate(c.at)})),
+        assigneeId: selTk.assigneeId || '',
+        assigneeName: (s.users.find(u=>u.id===selTk.assigneeId) || {name:t.unassigned}).name,
+        log: selTk.log.map(l=>({author:l.author, text:l.text, dateLabel:this.fmtDate(l.at)}))
+      };
+    }
+    const canAssign = role==='Super Admin'||role==='Maintenance Manager'||role==='Supervisor';
+    const assignableUsers = s.users.filter(u=>u.role!=='Read Only');
+
+    const accountOptions = this.accounts().map(a=>({id:a.id, label:a.name+' — '+this.roleLabelFor(a.role), name:a.name, roleLabel:this.roleLabelFor(a.role), onQuickLogin:()=>this.quickLogin(a.id)}));
+
+    const notifIcon = {created:'#2A5D8C', status:'#92600E', comment:'#1F7A3E'};
+    const notifications = [...s.notifications].sort((a,b)=>new Date(b.at)-new Date(a.at)).map(n=>({
+      title:n.title, body:n.body, timeLabel:this.fmtDate(n.at), dotColor: n.read?'#E6E1DB':(notifIcon[n.kind]||'#736C64'),
+      bg: n.read?'#fff':'#FBF7F2', onClick:()=>this.openNotification(n)
+    }));
+    const hasUnread = s.notifications.some(n=>!n.read);
+
+    const titleMap = {dashboard:t.dashboard, tickets: role==='Branch Staff'?t.myTickets:t.allTickets, newTicket:t.newTicket, ticketDetail:'#'+(s.selectedTicketId||''), branches:t.manageBranches, users:t.manageUsers, fields:t.ticketFields};
+
+    return {
+      t, dir:s.dir, lang:s.lang, isLoggedIn, showLogin: !isLoggedIn,
+      currentAccountId:s.currentAccountId, currentAccount: acc ? {name:acc.name, roleLabel:this.roleLabelFor(acc.role), initials:acc.name.split(' ').map(w=>w[0]).slice(0,2).join('')} : {name:'',roleLabel:'',initials:''},
+      navItems, accountOptions, switchAccountHint: s.lang==='en'?'Preview as another role':'', showAccountSwitcher: role==='Super Admin',
+      showNotifications:s.showNotifications, onToggleNotifications:()=>this.onToggleNotifications(), onMarkAllRead:()=>this.onMarkAllRead(),
+      notifications, hasUnread, noNotifications: notifications.length===0,
+      viewTitle: titleMap[s.view] || '',
+      showQuickAddButton: canSubmitTicket && s.view!=='newTicket', onGoToNewTicket:()=>this.goToNewTicket(),
+      onLangChange:(e)=>this.onLangChange(e), onSwitchAccount:(e)=>this.onSwitchAccount(e), logout:()=>this.logout(),
+      isDashboard: s.view==='dashboard', isTicketList: s.view==='tickets', isNewTicket: s.view==='newTicket', isTicketDetail: s.view==='ticketDetail' && !!selectedTicket,
+      isBranches: s.view==='branches' && canManageBranches, isUsers: s.view==='users' && canManageUsers, isFields: s.view==='fields' && canManageFields,
+      rangeOptions, statCards, statusBars, priorityBars, typeBars, branchBars, insights, userPerformance, onExportTicketsReport:()=>this.onExportTicketsReport(), onExportUsersReport:()=>this.onExportUsersReport(),
+      filters:s.filters, onSearchChange:(e)=>this.onSearchChange(e), onStatusFilterChange:(e)=>this.onStatusFilterChange(e), onPriorityFilterChange:(e)=>this.onPriorityFilterChange(e), onCategoryFilterChange:(e)=>this.onCategoryFilterChange(e), onBranchFilterChange:(e)=>this.onBranchFilterChange(e),
+      statusOptions: Component.STATUSES.map(st=>({id:st.id,label:this.label(Component.STATUSES,st.id)})),
+      priorityOptions: s.priorities.map(p=>({id:p.id,label:this.label(s.priorities,p.id)})),
+      categoryOptions: s.categories.map(c=>({id:c.id,label:this.label(s.categories,c.id)})),
+      branchOptions: s.branches.map(b=>({id:b.id,label:b.name})),
+      showBranchFilter: role!=='Branch Staff',
+      hasFilteredTickets: filteredTickets.length>0, noFilteredTickets: filteredTickets.length===0, filteredTickets,
+      newTicketBranchLabel: acc && acc.branchId ? branchName(acc.branchId) : (t.filterBranch),
+      ticketForm:s.ticketForm, typeOptions: s.ticketTypes.map(ty=>({id:ty.id,label:this.label(s.ticketTypes,ty.id)})),
+      onFormTypeChange:(e)=>this.onFormTypeChange(e), onFormPriorityChange:(e)=>this.onFormPriorityChange(e), onFormCategoryChange:(e)=>this.onFormCategoryChange(e), onFormSubjectChange:(e)=>this.onFormSubjectChange(e), onFormDescriptionChange:(e)=>this.onFormDescriptionChange(e),
+      onFileUpload:(e)=>this.onFileUpload(e), onCancelNewTicket:()=>this.onCancelNewTicket(), onSubmitTicket:()=>this.onSubmitTicket(),
+      selectedTicket, canChangeStatus, canComment, canAssign, assignableUsers, showAssigneeReadOnly: !canAssign && !!selectedTicket && !!selectedTicket.assigneeId,
+      onAssignTicket:(e)=>this.onAssignTicket(e), onChangeStatus:(e)=>this.onChangeStatus(e), onBackToList:()=>this.onBackToList(),
+      newComment:s.newComment, onNewCommentChange:(e)=>this.onNewCommentChange(e), onPostComment:()=>this.onPostComment(),
+      branches: s.branches.map(b=>({...b, onDelete:()=>this.deleteBranch(b.id)})),
+      newBranchName:s.newBranchName, newBranchNameAr:s.newBranchNameAr, newBranchUser:s.newBranchUser, newBranchPass:s.newBranchPass, branchFormError:s.branchFormError,
+      onNewBranchName:(e)=>this.onNewBranchName(e), onNewBranchNameAr:(e)=>this.onNewBranchNameAr(e), onNewBranchUser:(e)=>this.onNewBranchUser(e), onNewBranchPass:(e)=>this.onNewBranchPass(e), onAddBranch:()=>this.onAddBranch(),
+      users: s.users.map(u=>({...u, onDelete:()=>this.deleteUser(u.id)})),
+      newUserName:s.newUserName, newUserUsername:s.newUserUsername, newUserPass:s.newUserPass, newUserRole:s.newUserRole,
+      onNewUserName:(e)=>this.onNewUserName(e), onNewUserUsername:(e)=>this.onNewUserUsername(e), onNewUserPass:(e)=>this.onNewUserPass(e), onNewUserRole:(e)=>this.onNewUserRole(e), onAddUser:()=>this.onAddUser(),
+      categories: s.categories.map(c=>({label:this.label(s.categories,c.id), onDelete:()=>this.deleteCategory(c.id)})),
+      ticketTypes: s.ticketTypes.map(ty=>({label:this.label(s.ticketTypes,ty.id), onDelete:()=>this.deleteType(ty.id)})),
+      priorities: s.priorities.map(p=>({label:this.label(s.priorities,p.id), onDelete:()=>this.deletePriority(p.id)})),
+      newFieldCategory:s.newFieldCategory, newFieldCategoryAr:s.newFieldCategoryAr, categoryFormError:s.categoryFormError,
+      newFieldType:s.newFieldType, newFieldTypeAr:s.newFieldTypeAr, typeFormError:s.typeFormError,
+      newFieldPriority:s.newFieldPriority, newFieldPriorityAr:s.newFieldPriorityAr, priorityFormError:s.priorityFormError,
+      onNewFieldCategory:(e)=>this.onNewFieldCategory(e), onNewFieldCategoryAr:(e)=>this.onNewFieldCategoryAr(e), onAddCategory:()=>this.onAddCategory(),
+      onNewFieldType:(e)=>this.onNewFieldType(e), onNewFieldTypeAr:(e)=>this.onNewFieldTypeAr(e), onAddType:()=>this.onAddType(),
+      onNewFieldPriority:(e)=>this.onNewFieldPriority(e), onNewFieldPriorityAr:(e)=>this.onNewFieldPriorityAr(e), onAddPriority:()=>this.onAddPriority(),
+      loginUsername:s.loginUsername, loginPassword:s.loginPassword, hasLoginError: s.loginError==='invalid',
+      onLoginUsernameChange:(e)=>this.onLoginUsernameChange(e), onLoginPasswordChange:(e)=>this.onLoginPasswordChange(e), onLogin:()=>this.onLogin()
+    };
+  }
+}
+</script>
+</body>
+</html>
